@@ -30,7 +30,7 @@
 ** email <mota@souitom.org>
 **
 ** Started on  Sat May 14 03:08:37 2011 mota
-** Last update Sun May 15 03:18:12 2011 mota
+** Last update Sun May 15 04:52:09 2011 mota
 */
 
 #ifndef		CCLIST_H_
@@ -303,20 +303,45 @@ do							\
       CCLIST_INSERT(list, _tmp, left);			\
   } while (0)
 
-#define		CCLIST_CLEAR(list, tmp, free_func)	\
+/* In C: void	(*free_func)(entry_type *entry) */
+/* In C++: void	(*free_func)(void *entry) */
+
+#define		CCLIST_DESTROY_FRONT(list, free_func)	\
+do							\
+  {							\
+    void	*_tmp = CCLIST_HEAD(list);		\
+    CCLIST_HEAD(list) = CCLIST_HEAD(list)->next;	\
+    if (CCLIST_HEAD(list) != NULL)			\
+      CCLIST_HEAD(list)->prev = NULL;			\
+    --CCLIST_SIZE(list);				\
+    free_func(_tmp);					\
+  } while (0)
+
+
+#define		CCLIST_DESTROY_BACK(list, free_func)	\
+do							\
+  {							\
+    void	*_tmp = CCLIST_TAIL(list);		\
+    CCLIST_TAIL(list) = CCLIST_TAIL(list)->prev;	\
+    if (CCLIST_TAIL(list) != NULL)			\
+      CCLIST_TAIL(list)->next = NULL;			\
+    --CCLIST_SIZE(list);				\
+    free_func(_tmp);					\
+  } while (0)
+
+#define		CCLIST_CLEAR(list, free_func)		\
 do							\
   {							\
     while (!CCLIST_EMPTY(list))				\
       {							\
-	CCLIST_POP_FRONT(list, tmp);			\
-	free_func(tmp);					\
+	CCLIST_DESTROY_FRONT(list, free_func);		\
       }							\
   } while (0)
 
-#define		CCLIST_FREE(list, tmp)		\
+#define		CCLIST_FREE(list)		\
 do						\
   {						\
-    CCLIST_CLEAR(list, tmp, free);		\
+    CCLIST_CLEAR(list, free);			\
   } while (0)
 
 #endif		/* !CCLIST_H_ */

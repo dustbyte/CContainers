@@ -185,9 +185,11 @@ int			main(void)
   tmp = CCLIST_HEAD(&list);
   tmp2 = CCLIST_TAIL(&list);
   CCLIST_SWAP(&list, tmp, tmp2, s_entry);
+
   tmp = CCLIST_HEAD(&list)->next;
   tmp2 = CCLIST_TAIL(&list)->prev;
   CCLIST_SWAP(&list, tmp, tmp2, s_entry);
+
   tmp = CCLIST_HEAD(&list);
   tmp2 = CCLIST_HEAD(&list);
   CCLIST_SWAP(&list, tmp, tmp2, s_entry);
@@ -221,11 +223,12 @@ int			main(void)
 
   puts("\n==Deleting the rest==\n");
 
-  CCLIST_CLEAR(&list, tmp, free);
+  CCLIST_CLEAR(&list, free);
 
   puts("\n==Try again==\n");
-  CCLIST_FREE(&list, tmp);
+  CCLIST_FREE(&list);
 
   printf("size: %d\n\n", CCLIST_SIZE(&list));
+
   return (0);
 }
