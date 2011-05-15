@@ -74,10 +74,10 @@ static int		val_cmp(int left, int right)
 int			main(void)
 {
   CCLIST_CREATE(s_list)	list;
-  struct s_entry		*tmp;
-  struct s_entry		*tmp2;
-  struct s_entry		*junk;
-  struct s_entry		ref = {6, 0, 0};
+  struct s_entry	*tmp;
+  struct s_entry	*tmp2;
+  struct s_entry	*junk;
+  struct s_entry	ref = {6, 0, 0};
   size_t		i = 0;
 
   CCLIST_INIT(&list);
@@ -105,7 +105,9 @@ int			main(void)
   create_entry(&list, 6);
   list_infos(&list);
 
-  printf("size: %d\n\n", CCLIST_SIZE(&list));
+  puts("\n==Show list size==\n");
+
+  printf("size: %d\n", CCLIST_SIZE(&list));
 
   puts("\n==Iteration==\n");
 
