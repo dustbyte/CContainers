@@ -1,30 +1,28 @@
-NAME	=	unit_test
+CC		=	gcc
+RM		=	rm -f
 
-CC	=	gcc
-RM	=	rm -f
+CFLAGS		+=	-W -Wall -ansi -pedantic
+CFLAGS		+=	-gdwarf-2 -g3
 
-CFLAGS	+=	-W -Wall -ansi -pedantic
-CFLAGS	+=	-gdwarf-2 -g3
+INCDIR		=	include
+SRCDIR		=	unit_test
 
-SRCDIR	=	src
-INCDIR	=	include
+UT_LIST		=	ut_list
+LIST_SRC	=	$(SRCDIR)/ut_list.c
+LIST_OBJ	=	$(LIST_SRC:.c=.o)
 
-SRC	=	$(SRCDIR)/main.c
+all:			$(UT_LIST)
 
-OBJ	=	$(SRC:.c=.o)
-
-$(NAME):	$(OBJ)
-		$(CC) $(OBJ) -o $(NAME)
-
-all:		$(NAME)
+$(UT_LIST):		$(LIST_OBJ)
+			$(CC) $(LIST_OBJ) $(LDFLAGS) -o $(UT_LIST)
 
 clean:
-		$(RM) $(OBJ)
+			$(RM) $(LIST_OBJ)
 
-distclean:	clean
-		$(RM) $(NAME)
+distclean:		clean
+			$(RM) $(UT_LIST)
 
-re:		distclean all
+re:			distclean all
 
 .c.o:
-		$(CC) -I$(INCDIR) $(CFLAGS) -c $< -o $@
+			$(CC) -I$(INCDIR) $(CFLAGS) -c $< -o $@

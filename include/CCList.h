@@ -30,7 +30,7 @@
 ** email <mota@souitom.org>
 **
 ** Started on  Sat May 14 03:08:37 2011 mota
-** Last update Sun May 15 02:12:54 2011 mota
+** Last update Sun May 15 03:18:12 2011 mota
 */
 
 #ifndef		CCLIST_H_
@@ -274,19 +274,20 @@ do									\
       }									\
   } while (0)
 
-#define		CCLIST_REVERSE(list, tmplist, type)	\
-do							\
-  {							\
-    struct type *tmp;					\
-    while (!CCLIST_EMPTY(list))				\
-      {							\
-	CCLIST_POP_FRONT(list, tmp);			\
-	CCLIST_PUSH_FRONT(tmplist, tmp);		\
-      }							\
-    CCLIST_DUP(tmplist, list);				\
+#define		CCLIST_REVERSE(list, list_type, entry_type)	\
+do								\
+  {								\
+    struct entry_type		*_tmp;				\
+    CCLIST_CREATE(list_type)	_tmp_list;			\
+    CCLIST_INIT(&_tmp_list);					\
+    while (!CCLIST_EMPTY(list))					\
+      {								\
+	CCLIST_POP_FRONT(list, _tmp);				\
+	CCLIST_PUSH_FRONT(&(_tmp_list), _tmp);			\
+      }								\
+    CCLIST_DUP(&(_tmp_list), list);				\
   } while (0)
 
-/* Not Working */
 #define		CCLIST_SWAP(list, left, right, type)	\
 do							\
   {							\

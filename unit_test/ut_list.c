@@ -3,15 +3,15 @@
 
 #include "CContainers.h"
 
-struct		s_test
+struct		s_entry
 {
   int		nb;
-  CCLIST_ENTRY(s_test);
+  CCLIST_ENTRY(s_entry);
 };
 
-CCLIST_PROTO(s_list, s_test);
+CCLIST_PROTO(s_list, s_entry);
 
-static void		inspect(struct s_test* entry)
+static void		inspect(struct s_entry* entry)
 {
   printf("val is: %d\n", entry->nb);
   printf("entry is: %p\n", (void *)entry);
@@ -28,7 +28,7 @@ static void		list_infos(CCLIST_NAME(s_list) *list)
 
 static void		create_entry(CCLIST_NAME(s_list) *list, int val)
 {
-  struct s_test	*nentry = malloc(sizeof(*nentry));
+  struct s_entry	*nentry = malloc(sizeof(*nentry));
 
   if (nentry != NULL)
     {
@@ -43,7 +43,7 @@ static void		create_entry(CCLIST_NAME(s_list) *list, int val)
 
 static void		create_entry_front(CCLIST_NAME(s_list) *list, int val)
 {
-  struct s_test	*nentry = malloc(sizeof(*nentry));
+  struct s_entry	*nentry = malloc(sizeof(*nentry));
 
   if (nentry != NULL)
     {
@@ -56,12 +56,12 @@ static void		create_entry_front(CCLIST_NAME(s_list) *list, int val)
     }
 }
 
-static void		entry_display(struct s_test *entry)
+static void		entry_display(struct s_entry *entry)
 {
   printf("%d :: %p\n", entry->nb, (void *)entry);
 }
 
-static int		item_cmp(struct s_test *entry1, struct s_test* entry2)
+static int		entry_cmp(struct s_entry *entry1, struct s_entry* entry2)
 {
   return (entry1->nb == entry2->nb);
 }
@@ -74,15 +74,13 @@ static int		val_cmp(int left, int right)
 int			main(void)
 {
   CCLIST_CREATE(s_list)	list;
-  CCLIST_CREATE(s_list)	tmplist;
-  struct s_test		*tmp;
-  struct s_test		*tmp2;
-  struct s_test		*junk;
-  struct s_test		ref = {6, 0, 0};
+  struct s_entry		*tmp;
+  struct s_entry		*tmp2;
+  struct s_entry		*junk;
+  struct s_entry		ref = {6, 0, 0};
   size_t		i = 0;
 
   CCLIST_INIT(&list);
-  CCLIST_INIT(&tmplist);
 
   puts("\n==Creating list (PUSH_BACK)==\n");
 
@@ -107,6 +105,8 @@ int			main(void)
   create_entry(&list, 6);
   list_infos(&list);
 
+  printf("size: %d\n\n", CCLIST_SIZE(&list));
+
   puts("\n==Iteration==\n");
 
   CCLIST_FOREACH(&list, tmp)
@@ -123,7 +123,7 @@ int			main(void)
 
   puts("\n==Reversion==\n");
 
-  CCLIST_REVERSE(&list, &tmplist, s_test);
+  CCLIST_REVERSE(&list, s_list, s_entry);
   CCLIST_FOREACH(&list, tmp)
     {
       entry_display(tmp);
@@ -133,14 +133,14 @@ int			main(void)
   puts("\n==Find entry==\n");
 
   tmp = NULL;
-  CCLIST_FIND(&list, tmp, &ref, item_cmp);
+  CCLIST_FIND(&list, tmp, &ref, entry_cmp);
   if (tmp != NULL)
       entry_display(tmp);
 
   puts("\n==Reverse find entry==\n");
 
   tmp = NULL;
-  CCLIST_RFIND(&list, tmp, &ref, item_cmp);
+  CCLIST_RFIND(&list, tmp, &ref, entry_cmp);
   if (tmp != NULL)
       entry_display(tmp);
 
@@ -182,13 +182,13 @@ int			main(void)
 
   tmp = CCLIST_HEAD(&list);
   tmp2 = CCLIST_TAIL(&list);
-  CCLIST_SWAP(&list, tmp, tmp2, s_test);
+  CCLIST_SWAP(&list, tmp, tmp2, s_entry);
   tmp = CCLIST_HEAD(&list)->next;
   tmp2 = CCLIST_TAIL(&list)->prev;
-  CCLIST_SWAP(&list, tmp, tmp2, s_test);
+  CCLIST_SWAP(&list, tmp, tmp2, s_entry);
   tmp = CCLIST_HEAD(&list);
   tmp2 = CCLIST_HEAD(&list);
-  CCLIST_SWAP(&list, tmp, tmp2, s_test);
+  CCLIST_SWAP(&list, tmp, tmp2, s_entry);
 
   CCLIST_FOREACH(&list, junk)
     {
@@ -223,5 +223,7 @@ int			main(void)
 
   puts("\n==Try again==\n");
   CCLIST_FREE(&list, tmp);
+
+  printf("size: %d\n\n", CCLIST_SIZE(&list));
   return (0);
 }
