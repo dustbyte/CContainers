@@ -6,10 +6,10 @@
 struct		s_entry
 {
   int		nb;
-  CCLIST_ENTRY(s_entry);
+  CCLIST_ENTRY(struct s_entry);
 };
 
-CCLIST_PROTO(s_list, s_entry);
+CCLIST_PROTO(s_list, struct s_entry);
 
 static void		inspect(struct s_entry* entry)
 {
@@ -71,9 +71,15 @@ static int		val_cmp(int left, int right)
   return (left == right);
 }
 
+static void		copy_entry(const struct s_entry * const ref, struct s_entry *cpy)
+{
+  cpy->nb = ref->nb;
+}
+
 int			main(void)
 {
   CCLIST_CREATE(s_list)	list;
+  CCLIST_CREATE(s_list)	copy;
   struct s_entry	*tmp;
   struct s_entry	*tmp2;
   struct s_entry	*junk;
@@ -123,14 +129,35 @@ int			main(void)
       entry_display(tmp);
     }
 
-  puts("\n==Reversion==\n");
+  puts("\n==Duplication==\n");
 
-  CCLIST_REVERSE(&list, s_list, s_entry);
-  CCLIST_FOREACH(&list, tmp)
+  CCLIST_DUP(&list, &copy, struct s_entry);
+
+  CCLIST_FOREACH(&copy, tmp)
     {
       entry_display(tmp);
     }
 
+  CCLIST_FREE(&copy);
+
+  puts("\n==Copy==\n");
+
+  CCLIST_COPY(&list, &copy, struct s_entry, copy_entry, free);
+
+  CCLIST_FOREACH(&copy, tmp)
+    {
+      entry_display(tmp);
+    }
+
+  CCLIST_FREE(&copy);
+
+  puts("\n==Reversion==\n");
+
+  CCLIST_REVERSE(&list, s_list, struct s_entry);
+  CCLIST_FOREACH(&list, tmp)
+    {
+      entry_display(tmp);
+    }
 
   puts("\n==Find entry==\n");
 
@@ -184,15 +211,15 @@ int			main(void)
 
   tmp = CCLIST_HEAD(&list);
   tmp2 = CCLIST_TAIL(&list);
-  CCLIST_SWAP(&list, tmp, tmp2, s_entry);
+  CCLIST_SWAP(&list, tmp, tmp2, struct s_entry);
 
   tmp = CCLIST_HEAD(&list)->next;
   tmp2 = CCLIST_TAIL(&list)->prev;
-  CCLIST_SWAP(&list, tmp, tmp2, s_entry);
+  CCLIST_SWAP(&list, tmp, tmp2, struct s_entry);
 
   tmp = CCLIST_HEAD(&list);
   tmp2 = CCLIST_HEAD(&list);
-  CCLIST_SWAP(&list, tmp, tmp2, s_entry);
+  CCLIST_SWAP(&list, tmp, tmp2, struct s_entry);
 
   CCLIST_FOREACH(&list, junk)
     {

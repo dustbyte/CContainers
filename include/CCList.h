@@ -30,7 +30,7 @@
 ** email <mota@souitom.org>
 **
 ** Started on  Sat May 14 03:08:37 2011 mota
-** Last update Sun May 15 04:52:09 2011 mota
+** Last update Tue May 17 02:47:14 2011 mota
 */
 
 #ifndef		CCLIST_H_
@@ -38,15 +38,15 @@
 
 #include <stdlib.h>
 
-#define		CCLIST_ENTRY(type)		\
-struct type	*next;				\
-struct type	*prev
+#define		CCLIST_ENTRY(entry_type)	\
+  entry_type	*next;				\
+  entry_type	*prev
 
-#define		CCLIST_PROTO(name, type)	\
+#define		CCLIST_PROTO(name, entry_type)	\
 struct name					\
 {						\
-  struct type	*head;				\
-  struct type	*tail;				\
+  entry_type	*head;				\
+  entry_type	*tail;				\
   unsigned int	size;				\
 }
 
@@ -56,14 +56,6 @@ struct name
 #define		CCLIST_CREATE(name)		\
 CCLIST_NAME(name)
 
-#define		CCLIST_INIT(list)		\
-do						\
-  {						\
-    (list)->head = NULL;			\
-    (list)->tail = NULL;			\
-    (list)->size = 0;				\
-  } while (0)
-
 #define		CCLIST_EMPTY(list)	((list)->head == NULL)
 #define		CCLIST_HEAD(list)	(list)->head
 #define		CCLIST_TAIL(list)	(list)->tail
@@ -71,22 +63,20 @@ do						\
 #define		CCLIST_NEXT(entry)	(entry)->next
 #define		CCLIST_PREV(entry)	(entry)->prev
 
-#define		CCLIST_DUP(list, newlist)	\
+#define		CCLIST_INIT(list)		\
+do						\
+  {						\
+    CCLIST_HEAD(list) = NULL;			\
+    CCLIST_TAIL(list) = NULL;			\
+    CCLIST_SIZE(list) = 0;			\
+  } while (0)
+
+#define		CCLIST_REF(list, newlist)	\
 do						\
   {						\
     CCLIST_HEAD(newlist) = CCLIST_HEAD(list);	\
     CCLIST_TAIL(newlist) = CCLIST_TAIL(list);	\
     CCLIST_SIZE(newlist) = CCLIST_SIZE(list);	\
-  } while (0)
-
-#define		CCLIST_FIRST_ENTRY(list, entry)	\
-do						\
-  {						\
-    CCLIST_HEAD(list) = (entry);		\
-    CCLIST_TAIL(list) = (entry);		\
-    (entry)->next = NULL;			\
-    (entry)->prev = NULL;			\
-    ++CCLIST_SIZE(list);			\
   } while (0)
 
 /* Don't use with entry == list->head or entry == list->tail */
@@ -100,8 +90,8 @@ do						\
       (entry)->next->prev = (entry)->prev;	\
     if (CCLIST_HEAD(list) == (entry))		\
       CCLIST_HEAD(list) = (entry)->next;	\
-    if (CCLIST_TAIL(list) == (entry)){		\
-      CCLIST_TAIL(list) = (entry)->prev;}	\
+    if (CCLIST_TAIL(list) == (entry))		\
+      CCLIST_TAIL(list) = (entry)->prev;	\
     --CCLIST_SIZE(list);			\
   } while (0)
 
@@ -192,6 +182,44 @@ for ((tmp) = CCLIST_TAIL(list); (tmp) != NULL; (tmp) = (tmp)->prev)
 #define		CCLIST_RFOREACH_SAFE(list, tmp, junk)			\
 for ((tmp) = CCLIST_TAIL(list); (tmp) != NULL && ((junk) = (tmp)->prev); (tmp) = (junk))
 
+/* void	(*copy_func)(const entry_type * const ref, entry_type *cpy); */
+/* void (*delete_func)(entry_type *entry); */
+#define		CCLIST_COPY(list, newlist, entry_type, copy_func, delete_func) \
+do									\
+  {									\
+    entry_type	*_tmp;							\
+    entry_type	*_entry;						\
+    CCLIST_INIT(newlist);						\
+    CCLIST_FOREACH(list, _tmp)						\
+      {									\
+	if ((_entry = malloc(sizeof *_entry)) == NULL)			\
+	  {								\
+	    CCLIST_CLEAR(newlist, delete_func);				\
+	    break;							\
+	  }								\
+	copy_func(_tmp, _entry);					\
+	CCLIST_PUSH_BACK(newlist, _entry);				\
+      }									\
+  } while (0)
+
+#define		CCLIST_DUP(list, newlist, entry_type)	\
+do							\
+  {							\
+    entry_type	*_tmp;					\
+    entry_type	*_entry;				\
+    CCLIST_INIT(newlist);				\
+    CCLIST_FOREACH(list, _tmp)				\
+      {							\
+	if ((_entry = malloc(sizeof *_entry)) == NULL)	\
+	  {						\
+	    CCLIST_FREE(newlist);			\
+	    break;					\
+	  }						\
+	*_entry = *_tmp;				\
+	CCLIST_PUSH_BACK(newlist, _entry);		\
+      }							\
+  } while (0)
+
 /* int (*cmp_func)(entry_type *left, entry_type ^right) */
 #define		CCLIST_FIND(list, tmp, ref, cmp_func)	\
 do							\
@@ -277,7 +305,7 @@ do									\
 #define		CCLIST_REVERSE(list, list_type, entry_type)	\
 do								\
   {								\
-    struct entry_type		*_tmp;				\
+    entry_type		*_tmp;					\
     CCLIST_CREATE(list_type)	_tmp_list;			\
     CCLIST_INIT(&_tmp_list);					\
     while (!CCLIST_EMPTY(list))					\
@@ -285,22 +313,22 @@ do								\
 	CCLIST_POP_FRONT(list, _tmp);				\
 	CCLIST_PUSH_FRONT(&(_tmp_list), _tmp);			\
       }								\
-    CCLIST_DUP(&(_tmp_list), list);				\
+    CCLIST_REF(&(_tmp_list), list);				\
   } while (0)
 
-#define		CCLIST_SWAP(list, left, right, type)	\
-do							\
-  {							\
-    struct type *_tmp = CCLIST_NEXT(right);		\
-    if ((_tmp) == (left))				\
-      (_tmp) = CCLIST_PREV(_tmp);			\
-    CCLIST_REMOVE(list, right);				\
-    CCLIST_INSERT(list, left, right);			\
-    CCLIST_REMOVE(list, left);				\
-    if (_tmp == NULL)					\
-      CCLIST_PUSH_BACK(list, left);			\
-    else						\
-      CCLIST_INSERT(list, _tmp, left);			\
+#define		CCLIST_SWAP(list, left, right, entry_type)	\
+do								\
+  {								\
+    entry_type *_tmp = CCLIST_NEXT(right);			\
+    if ((_tmp) == (left))					\
+      (_tmp) = CCLIST_PREV(_tmp);				\
+    CCLIST_REMOVE(list, right);					\
+    CCLIST_INSERT(list, left, right);				\
+    CCLIST_REMOVE(list, left);					\
+    if (_tmp == NULL)						\
+      CCLIST_PUSH_BACK(list, left);				\
+    else							\
+      CCLIST_INSERT(list, _tmp, left);				\
   } while (0)
 
 /* In C: void	(*free_func)(entry_type *entry) */
