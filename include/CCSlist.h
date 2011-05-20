@@ -30,7 +30,7 @@
 ** email <mota@souitom.org>
 **
 ** Started on  Fri May 20 03:54:25 2011 mota
-** Last update Fri May 20 05:12:17 2011 mota
+** Last update Fri May 20 05:13:30 2011 mota
 */
 
 #ifndef		CCSLIST_H_
@@ -171,14 +171,14 @@ do							\
   } while (0)
 
 /* int	(*cmp_func)(val_type left, val_type right) */
-#define		CCSLIST_FIND_FIELD(list, tmp, val, field, cmp_func)
-do						\
-  {						\
-    CCSLIST_FOREACH(list, tmp)			\
-      {						\
-	if (cmp_func(val, (tmp)->field) == 0)	\
-	  break;				\
-      }						\
+#define		CCSLIST_FIND_FIELD(list, tmp, val, field, cmp_func)	\
+do									\
+  {									\
+    CCSLIST_FOREACH(list, tmp)						\
+      {									\
+	if (cmp_func(val, (tmp)->field) == 0)				\
+	  break;							\
+      }									\
   } while (0)
 
 /* In C: void	(*free_func)(entry_type *entry) */
