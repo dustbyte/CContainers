@@ -30,7 +30,7 @@
 ** email <mota@souitom.org>
 **
 ** Started on  Sat May 14 03:08:37 2011 mota
-** Last update Fri May 20 02:52:24 2011 mota
+** Last update Fri May 20 05:05:32 2011 mota
 */
 
 #ifndef		CCLIST_H_
@@ -62,6 +62,26 @@ CCLIST_NAME(name)
 #define		CCLIST_SIZE(list)	(list)->size
 #define		CCLIST_NEXT(entry)	(entry)->next
 #define		CCLIST_PREV(entry)	(entry)->prev
+
+#define		CCLIST_FOREACH(list, tmp)	\
+for ((tmp) = CCLIST_HEAD(list);			\
+     (tmp) != NULL;				\
+     (tmp) = CCLIST_NEXT(tmp))
+
+#define		CCLIST_FOREACH_SAFE(list, tmp, junk)	\
+for ((tmp) = CCLIST_HEAD(list);				\
+     (tmp) != NULL && ((junk) = CCLIST_NEXT(tmp));	\
+     (tmp) = (junk))
+
+#define		CCLIST_RFOREACH(list, tmp)	\
+for ((tmp) = CCLIST_TAIL(list);			\
+     (tmp) != NULL;				\
+     (tmp) = CCLIST_PREV(tmp))
+
+#define		CCLIST_RFOREACH_SAFE(list, tmp, junk)	\
+for ((tmp) = CCLIST_TAIL(list);				\
+     (tmp) != NULL && ((junk) = CCLIST_PREV(tmp));	\
+     (tmp) = (junk))
 
 #define		CCLIST_INIT(list)		\
 do						\
@@ -170,18 +190,6 @@ do								\
       CCLIST_PUSH_BACK(list, entry);				\
   } while (0)
 
-#define		CCLIST_FOREACH(list, tmp)				\
-for ((tmp) = CCLIST_HEAD(list); (tmp) != NULL; (tmp) = (tmp)->next)
-
-#define		CCLIST_FOREACH_SAFE(list, tmp, junk)			\
-for ((tmp) = CCLIST_HEAD(list); (tmp) != NULL && ((junk) = (tmp)->next); (tmp) = (junk))
-
-#define		CCLIST_RFOREACH(list, tmp)				\
-for ((tmp) = CCLIST_TAIL(list); (tmp) != NULL; (tmp) = (tmp)->prev)
-
-#define		CCLIST_RFOREACH_SAFE(list, tmp, junk)			\
-for ((tmp) = CCLIST_TAIL(list); (tmp) != NULL && ((junk) = (tmp)->prev); (tmp) = (junk))
-
 /* void	(*copy_func)(const entry_type * const ref, entry_type *cpy); */
 /* void (*delete_func)(entry_type *entry); */
 #define		CCLIST_COPY(list, newlist, entry_type, copy_func, delete_func) \
@@ -189,6 +197,7 @@ do									\
   {									\
     entry_type	*_tmp;							\
     entry_type	*_entry;						\
+									\
     CCLIST_INIT(newlist);						\
     CCLIST_FOREACH(list, _tmp)						\
       {									\
@@ -207,6 +216,7 @@ do							\
   {							\
     entry_type	*_tmp;					\
     entry_type	*_entry;				\
+							\
     CCLIST_INIT(newlist);				\
     CCLIST_FOREACH(list, _tmp)				\
       {							\
@@ -223,21 +233,23 @@ do							\
 #define		CCLIST_REVERSE(list, list_type, entry_type)	\
 do								\
   {								\
-    entry_type		*_tmp;					\
+    entry_type			*_tmp;				\
     CCLIST_CREATE(list_type)	_tmp_list;			\
+								\
     CCLIST_INIT(&_tmp_list);					\
     while (!CCLIST_EMPTY(list))					\
       {								\
 	CCLIST_POP_FRONT(list, _tmp);				\
 	CCLIST_PUSH_FRONT(&(_tmp_list), _tmp);			\
       }								\
-    CCLIST_REF(&(_tmp_list), list);				\
+    CCLIST_REF(&_tmp_list, list);				\
   } while (0)
 
 #define		CCLIST_SWAP(list, left, right, entry_type)	\
 do								\
   {								\
     entry_type *_tmp = CCLIST_NEXT(right);			\
+								\
     if ((_tmp) == (left))					\
       (_tmp) = CCLIST_PREV(_tmp);				\
     CCLIST_REMOVE(list, right);					\
@@ -279,16 +291,6 @@ do							\
       }							\
   } while (0)
 
-#define		CCLIST_FIND_SAFE(list, tmp, junk, ref, cmp_func)	\
-do									\
-  {									\
-    CCLIST_FOREACH_SAFE(list, tmp, junk)				\
-      {									\
-	if (cmp_func(ref, tmp) == 0)					\
-	  break;							\
-      }									\
-  } while (0)
-
 #define		CCLIST_RFIND(list, tmp, ref, cmp_func)	\
 do							\
   {							\
@@ -299,31 +301,11 @@ do							\
       }							\
   } while (0)
 
-#define		CCLIST_RFIND_SAFE(list, tmp, junk, ref, cmp_func)	\
-do									\
-  {									\
-    CCLIST_RFOREACH_SAFE(list, tmp, junk)				\
-      {									\
-	if (cmp_func(ref, tmp) == 0)					\
-	  break;							\
-      }									\
-  } while (0)
-
 /* int	(*cmp_func)(val_type left, val_type right) */
 #define		CCLIST_FIND_FIELD(list, tmp, val, field, cmp_func)	\
 do									\
   {									\
     CCLIST_FOREACH(list, tmp)						\
-      {									\
-	if (cmp_func(val, (tmp)->field) == 0)				\
-	  break;							\
-      }									\
-  } while (0)
-
-#define		CCLIST_FIND_FIELD_SAFE(list, tmp, junk, val, field, cmp_func) \
-do									\
-  {									\
-    CCLIST_FOREACH_SAFE(list, tmp, junk)				\
       {									\
 	if (cmp_func(val, (tmp)->field) == 0)				\
 	  break;							\
@@ -340,23 +322,13 @@ do									\
       }									\
   } while (0)
 
-#define		CCLIST_RFIND_FIELD_SAFE(list, tmp, junk, val, field, cmp_func) \
-do									\
-  {									\
-    CCLIST_RFOREACH_SAFE(list, tmp, junk)				\
-      {									\
-	if (cmp_func(val, (tmp)->field) == 0)				\
-	  break;							\
-      }									\
-  } while (0)
-
 /* In C: void	(*free_func)(entry_type *entry) */
 /* In C++: void	(*free_func)(void *entry) */
-
 #define		CCLIST_DESTROY_FRONT(list, free_func)	\
 do							\
   {							\
     void	*_tmp = CCLIST_HEAD(list);		\
+							\
     CCLIST_HEAD(list) = CCLIST_HEAD(list)->next;	\
     if (CCLIST_HEAD(list) != NULL)			\
       CCLIST_HEAD(list)->prev = NULL;			\
@@ -369,6 +341,7 @@ do							\
 do							\
   {							\
     void	*_tmp = CCLIST_TAIL(list);		\
+							\
     CCLIST_TAIL(list) = CCLIST_TAIL(list)->prev;	\
     if (CCLIST_TAIL(list) != NULL)			\
       CCLIST_TAIL(list)->next = NULL;			\
@@ -386,9 +359,6 @@ do							\
   } while (0)
 
 #define		CCLIST_FREE(list)		\
-do						\
-  {						\
-    CCLIST_CLEAR(list, free);			\
-  } while (0)
+CCLIST_CLEAR(list, free)
 
 #endif		/* !CCLIST_H_ */
