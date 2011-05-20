@@ -63,12 +63,12 @@ static void		entry_display(struct s_entry *entry)
 
 static int		entry_cmp(struct s_entry *entry1, struct s_entry* entry2)
 {
-  return (entry1->nb == entry2->nb);
+  return (entry1->nb - entry2->nb);
 }
 
 static int		val_cmp(int left, int right)
 {
-  return (left == right);
+  return (left - right);
 }
 
 static void		copy_entry(const struct s_entry * const ref, struct s_entry *cpy)
@@ -220,6 +220,15 @@ int			main(void)
   tmp = CCLIST_HEAD(&list);
   tmp2 = CCLIST_HEAD(&list);
   CCLIST_SWAP(&list, tmp, tmp2, struct s_entry);
+
+  CCLIST_FOREACH(&list, junk)
+    {
+      entry_display(junk);
+    }
+
+  puts("\n==Sorting==\n");
+
+  CCLIST_SORT(&list, struct s_entry, entry_cmp);
 
   CCLIST_FOREACH(&list, junk)
     {

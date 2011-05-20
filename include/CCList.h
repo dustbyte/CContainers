@@ -30,7 +30,7 @@
 ** email <mota@souitom.org>
 **
 ** Started on  Sat May 14 03:08:37 2011 mota
-** Last update Tue May 17 02:47:14 2011 mota
+** Last update Fri May 20 02:52:24 2011 mota
 */
 
 #ifndef		CCLIST_H_
@@ -220,88 +220,6 @@ do							\
       }							\
   } while (0)
 
-/* int (*cmp_func)(entry_type *left, entry_type ^right) */
-#define		CCLIST_FIND(list, tmp, ref, cmp_func)	\
-do							\
-  {							\
-    CCLIST_FOREACH(list, tmp)				\
-      {							\
-	if (cmp_func(ref, tmp))				\
-	  break;					\
-      }							\
-  } while (0)
-
-#define		CCLIST_FIND_SAFE(list, tmp, junk, ref, cmp_func)	\
-do									\
-  {									\
-    CCLIST_FOREACH_SAFE(list, tmp, junk)				\
-      {									\
-	if (cmp_func(ref, tmp))						\
-	  break;							\
-      }									\
-  } while (0)
-
-#define		CCLIST_RFIND(list, tmp, ref, cmp_func)	\
-do							\
-  {							\
-    CCLIST_RFOREACH(list, tmp)				\
-      {							\
-	if (cmp_func(ref, tmp))				\
-	  break;					\
-      }							\
-  } while (0)
-
-#define		CCLIST_RFIND_SAFE(list, tmp, junk, ref, cmp_func)	\
-do									\
-  {									\
-    CCLIST_RFOREACH_SAFE(list, tmp, junk)				\
-      {									\
-	if (cmp_func(ref, tmp))						\
-	  break;							\
-      }									\
-  } while (0)
-
-/* int	(*cmp_func)(val_type left, val_type right) */
-#define		CCLIST_FIND_FIELD(list, tmp, val, field, cmp_func)	\
-do									\
-  {									\
-    CCLIST_FOREACH(list, tmp)						\
-      {									\
-	if (cmp_func(val, (tmp)->field))				\
-	  break;							\
-      }									\
-  } while (0)
-
-#define		CCLIST_FIND_FIELD_SAFE(list, tmp, junk, val, field, cmp_func) \
-do									\
-  {									\
-    CCLIST_FOREACH_SAFE(list, tmp, junk)				\
-      {									\
-	if (cmp_func(val, (tmp)->field))				\
-	  break;							\
-      }									\
-  } while (0)
-
-#define		CCLIST_RFIND_FIELD(list, tmp, val, field, cmp_func)	\
-do									\
-  {									\
-    CCLIST_RFOREACH(list, tmp)						\
-      {									\
-	if (cmp_func(val, (tmp)->field))				\
-	  break;							\
-      }									\
-  } while (0)
-
-#define		CCLIST_RFIND_FIELD_SAFE(list, tmp, junk, val, field, cmp_func) \
-do									\
-  {									\
-    CCLIST_RFOREACH_SAFE(list, tmp, junk)				\
-      {									\
-	if (cmp_func(val, (tmp)->field))				\
-	  break;							\
-      }									\
-  } while (0)
-
 #define		CCLIST_REVERSE(list, list_type, entry_type)	\
 do								\
   {								\
@@ -329,6 +247,107 @@ do								\
       CCLIST_PUSH_BACK(list, left);				\
     else							\
       CCLIST_INSERT(list, _tmp, left);				\
+  } while (0)
+
+/* int (*cmp_func)(entry_type *left, entry_type *right) */
+#define		CCLIST_SORT(list, entry_type, cmp_func)		\
+do								\
+  {								\
+    entry_type	*__tmp;						\
+    entry_type	*__prev;					\
+								\
+    CCLIST_FOREACH(list, __tmp)					\
+      {								\
+	if (__tmp == CCLIST_HEAD(list))				\
+	  continue;						\
+	__prev = CCLIST_PREV(__tmp);				\
+	if (cmp_func(__prev, __tmp) > 0)			\
+	  {							\
+	    CCLIST_SWAP(list, __prev, __tmp, entry_type);	\
+	    __tmp = CCLIST_HEAD(list);				\
+	  }							\
+      }								\
+  } while (0)
+
+#define		CCLIST_FIND(list, tmp, ref, cmp_func)	\
+do							\
+  {							\
+    CCLIST_FOREACH(list, tmp)				\
+      {							\
+	if (cmp_func(ref, tmp) == 0)			\
+	  break;					\
+      }							\
+  } while (0)
+
+#define		CCLIST_FIND_SAFE(list, tmp, junk, ref, cmp_func)	\
+do									\
+  {									\
+    CCLIST_FOREACH_SAFE(list, tmp, junk)				\
+      {									\
+	if (cmp_func(ref, tmp) == 0)					\
+	  break;							\
+      }									\
+  } while (0)
+
+#define		CCLIST_RFIND(list, tmp, ref, cmp_func)	\
+do							\
+  {							\
+    CCLIST_RFOREACH(list, tmp)				\
+      {							\
+	if (cmp_func(ref, tmp) == 0)			\
+	  break;					\
+      }							\
+  } while (0)
+
+#define		CCLIST_RFIND_SAFE(list, tmp, junk, ref, cmp_func)	\
+do									\
+  {									\
+    CCLIST_RFOREACH_SAFE(list, tmp, junk)				\
+      {									\
+	if (cmp_func(ref, tmp) == 0)					\
+	  break;							\
+      }									\
+  } while (0)
+
+/* int	(*cmp_func)(val_type left, val_type right) */
+#define		CCLIST_FIND_FIELD(list, tmp, val, field, cmp_func)	\
+do									\
+  {									\
+    CCLIST_FOREACH(list, tmp)						\
+      {									\
+	if (cmp_func(val, (tmp)->field) == 0)				\
+	  break;							\
+      }									\
+  } while (0)
+
+#define		CCLIST_FIND_FIELD_SAFE(list, tmp, junk, val, field, cmp_func) \
+do									\
+  {									\
+    CCLIST_FOREACH_SAFE(list, tmp, junk)				\
+      {									\
+	if (cmp_func(val, (tmp)->field) == 0)				\
+	  break;							\
+      }									\
+  } while (0)
+
+#define		CCLIST_RFIND_FIELD(list, tmp, val, field, cmp_func)	\
+do									\
+  {									\
+    CCLIST_RFOREACH(list, tmp)						\
+      {									\
+	if (cmp_func(val, (tmp)->field) == 0)				\
+	  break;							\
+      }									\
+  } while (0)
+
+#define		CCLIST_RFIND_FIELD_SAFE(list, tmp, junk, val, field, cmp_func) \
+do									\
+  {									\
+    CCLIST_RFOREACH_SAFE(list, tmp, junk)				\
+      {									\
+	if (cmp_func(val, (tmp)->field) == 0)				\
+	  break;							\
+      }									\
   } while (0)
 
 /* In C: void	(*free_func)(entry_type *entry) */
