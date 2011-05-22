@@ -30,7 +30,7 @@
 ** email <mota@souitom.org>
 **
 ** Started on  Fri May 20 03:54:25 2011 mota
-** Last update Fri May 20 05:13:30 2011 mota
+** Last update Mon May 23 00:35:04 2011 mota
 */
 
 #ifndef		CCSLIST_H_
@@ -39,7 +39,7 @@
 #include <stdlib.h>
 
 #define		CCSLIST_ENTRY(entry_type)	\
-entry_type	*next;
+entry_type	*next
 
 #define		CCSLIST_PROTO(name, entry_type)	\
 struct name					\
@@ -83,10 +83,10 @@ do						\
     CCSLIST_SIZE(newlist) = CCSLIST_SIZE(list);	\
   } while (0)
 
-#define		CCSLIST_REMOVE_HEAD(list, tmp)		\
+#define		CCSLIST_POP_HEAD(list, tmp)		\
 do							\
   {							\
-    (tmp) = CCSLIST_HEAD(list)				\
+    (tmp) = CCSLIST_HEAD(list);				\
     CCSLIST_HEAD(list) = CCSLIST_HEAD(list)->next;	\
     --CCSLIST_SIZE(list);				\
   } while (0)
@@ -116,34 +116,38 @@ do								\
     ++CCSLIST_SIZE(list);					\
   } while (0)
 
-#define		CCSLIST_INSERT(list, entry)			\
-do								\
-  {								\
-    CCSLIST_INSERT_AFTER(list, CCSLIST_HEAD(list), entry);	\
+#define		CCSLIST_INSERT(list, entry)		\
+do							\
+  {							\
+    CCSLIST_NEXT(entry) = CCSLIST_HEAD(list);		\
+    CCSLIST_HEAD(list) = (entry);			\
+    ++CCSLIST_SIZE(list);				\
   } while (0)
 
-#define		CCSLIST_REVERSE(list, list_type, entry_type)	\
-do								\
-  {								\
-    entry_type			*_tmp;				\
-    CCSLIST_CREATE(list_type)	_tmp_list;			\
-								\
-    CCSLIST_INIT(_tmp_list);					\
-    while (!CCSLIST_EMPTY(list))				\
-      {								\
-	CCSLIST_POP_HEAD(list, _tmp);				\
-	CCSLIST_INSERT(list, _tmp);				\
-      }								\
-    CCSLIST_REF(&_tmp_list, list);				\
+#define		CCSLIST_REVERSE(list, entry_type)	\
+do							\
+  {							\
+    entry_type			*_tmp;			\
+    entry_type			*_next;			\
+    entry_type			*_dead = NULL;		\
+							\
+    CCSLIST_FOREACH_SAFE(list, _tmp, _next)		\
+      {							\
+        CCSLIST_NEXT(_tmp) = _dead;			\
+	(_dead) = (_tmp);				\
+      }							\
+    CCSLIST_NEXT(_tmp) = (_dead);			\
+    CCSLIST_HEAD(list) = (_tmp);			\
   } while (0)
 
 /* void	(*copy_func)(const entry_type * const ref, entry_type *cpy); */
 /* void (*delete_func)(entry_type *entry); */
-#define		CCSLIST_COPY(list, newlist, entry_type, copy_func, delete_func)	\
+#define		CCSLIST_COPY(list, newlist, entry_type, copy_func, delete_func) \
 do									\
   {									\
     entry_type	*_tmp;							\
     entry_type	*_entry;						\
+    entry_type	*_dead;							\
 									\
     CCSLIST_INIT(newlist);						\
     CCSLIST_FOREACH(list, _tmp)						\
@@ -154,9 +158,12 @@ do									\
 	    break;							\
 	  }								\
 	copy_func(_tmp, _entry);					\
-	CCSLIST_INSERT(newlist, _entry);				\
+	if (CCSLIST_HEAD(newlist) == NULL)				\
+	  CCSLIST_INSERT(newlist, _entry);				\
+	else								\
+	  CCSLIST_INSERT_AFTER(newlist, _dead, _entry);			\
+	_dead = (_entry);						\
       }									\
-    CCSLIST_REVERSE(newlist);						\
   } while (0)
 
 /* int (*cmp_func)(entry_type *left, entry_type *right) */
