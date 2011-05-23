@@ -30,12 +30,14 @@
 ** email <mota@souitom.org>
 **
 ** Started on  Fri May 13 03:01:34 2011 mota
-** Last update Sat May 14 03:31:45 2011 mota
+** Last update Mon May 23 04:03:58 2011 mota
 */
 
 #ifndef		CCONTAINERS_H_
 # define	CCONTAINERS_H_
 
 #include "CCList.h"
+#include "CCSlist.h"
+#include "CCStack.h"
 
 #endif		/* !CCONTAINERS_H_ */
