@@ -30,7 +30,7 @@
 ** email <mota@souitom.org>
 **
 ** Started on  Sat May 14 03:08:37 2011 mota
-** Last update Fri May 20 05:05:32 2011 mota
+** Last update Mon May 23 03:59:33 2011 mota
 */
 
 #ifndef		CCLIST_H_
@@ -230,19 +230,23 @@ do							\
       }							\
   } while (0)
 
-#define		CCLIST_REVERSE(list, list_type, entry_type)	\
+#define		CCLIST_REVERSE(list, entry_type)		\
 do								\
   {								\
-    entry_type			*_tmp;				\
-    CCLIST_CREATE(list_type)	_tmp_list;			\
+    entry_type	*_tmp;						\
+    entry_type	*_next;						\
+    int		flag = 1;					\
 								\
-    CCLIST_INIT(&_tmp_list);					\
-    while (!CCLIST_EMPTY(list))					\
+    CCLIST_FOREACH_SAFE(list, _tmp, _next)			\
       {								\
-	CCLIST_POP_FRONT(list, _tmp);				\
-	CCLIST_PUSH_FRONT(&(_tmp_list), _tmp);			\
+	if (flag)						\
+	  {							\
+	    CCLIST_INIT(list);					\
+	    flag = 0;						\
+	  }							\
+	CCLIST_PUSH_FRONT(list, _tmp);				\
       }								\
-    CCLIST_REF(&_tmp_list, list);				\
+    CCLIST_PUSH_FRONT(list, _tmp);				\
   } while (0)
 
 #define		CCLIST_SWAP(list, left, right, entry_type)	\

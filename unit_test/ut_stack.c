@@ -24,61 +24,55 @@
 ** (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 ** SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **
-** ut_slist.c for project CContainers
+** ut_stack.c for project CContainers
 **
 ** Made by mota
 ** email <mota@souitom.org>
 **
-** Started on  Sun May 22 22:42:54 2011 mota
-** Last update Mon May 23 01:12:59 2011 mota
+** Started on  Mon May 23 01:12:01 2011 mota
+** Last update Mon May 23 03:39:49 2011 mota
 */
 
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "CCSlist.h"
+#include "CCStack.h"
 
-typedef struct s_entry t_entry;
-
-struct s_entry
+typedef struct s_entry
 {
   int		nb;
 
-  CCSLIST_ENTRY(t_entry);
-};
+  CCSTACK_ENTRY(struct s_entry);
+} t_entry;
 
-CCSLIST_PROTO(s_slist, t_entry);
-typedef struct s_slist t_slist;
+CCSTACK_PROTO(s_stack, t_entry);
+typedef struct s_stack t_stack;
 
-static void	insert_entry(t_slist *slist, int val)
+/* This is evil, created only for tests */
+static void	display_stack(t_stack *stack)
+{
+  t_entry	*tmp;
+
+  CCSLIST_FOREACH(stack, tmp)
+    {
+      printf("%d :: %p\n", tmp->nb, (void *)tmp);
+    }
+}
+
+static void	push_on_stack(t_stack *stack, int i)
 {
   t_entry	*nentry = malloc(sizeof(*nentry));
 
   if (nentry != NULL)
     {
-      nentry->nb = val;
-      CCSLIST_INSERT(slist, nentry);
+      nentry->nb = i;
+      CCSTACK_PUSH(stack, nentry);
     }
 }
 
-static int	cmp_entry(t_entry *left, t_entry *right)
+static void	copy_entry(const t_entry * const left, t_entry *right)
 {
-  return (right->nb - left->nb);
-}
-
-static int	cmp_val(int left_val, int right_val)
-{
-  return (right_val - left_val);
-}
-
-static void	display_entry(t_entry *entry)
-{
-  printf("%d :: %p\n", entry->nb, (void *)entry);
-}
-
-static void	copy_entry(const t_entry * const orig, t_entry *copy)
-{
-  copy->nb = orig->nb;
+  right->nb = left->nb;
 }
 
 static void	ut_step(const char *msg)
@@ -88,71 +82,37 @@ static void	ut_step(const char *msg)
 
 int		main(void)
 {
-  t_slist	slist;
-  t_slist	cpy;
+  t_stack	stack;
+  t_stack	cpy;
   t_entry	*tmp;
-  t_entry	ref = {5, NULL};
   size_t	i;
 
-  CCSLIST_INIT(&slist);
-
-  ut_step("Creation");
+  CCSTACK_INIT(&stack);
 
   for (i = 0; i < 10; ++i)
-    insert_entry(&slist, i);
+    push_on_stack(&stack, i);
 
-  ut_step("Iteration");
+  display_stack(&stack);
 
-  CCSLIST_FOREACH(&slist, tmp)
-    {
-      display_entry(tmp);
-    }
+  ut_step("Poping");
 
-  if ((tmp = malloc(sizeof(*tmp))) != NULL)
-    {
-      ut_step("Insertion");
-      tmp->nb = i + 1;
-      CCSLIST_INSERT_AFTER(&slist, CCSLIST_HEAD(&slist), tmp);
+  CCSTACK_POP(&stack, tmp);
+  display_stack(&stack);
 
-      CCSLIST_FOREACH(&slist, tmp)
-	{
-	  display_entry(tmp);
-	}
-    }
+  ut_step("Pushing");
 
-  ut_step("Search");
+  CCSTACK_PUSH(&stack, tmp);
+  display_stack(&stack);
 
-  CCSLIST_FIND(&slist, tmp, &ref, cmp_entry);
-  if (tmp != NULL)
-    display_entry(tmp);
+  ut_step("Copying");
 
-  ut_step("Search with field");
+  CCSTACK_COPY(&stack, &cpy, t_entry, copy_entry, free);
+  display_stack(&cpy);
 
-  CCSLIST_FIND_FIELD(&slist, tmp, 2, nb, cmp_val);
-  if (tmp != NULL)
-    display_entry(tmp);
+  ut_step("Cleaning");
+  CCSTACK_FREE(&stack);
+  CCSTACK_FREE(&cpy);
 
-  ut_step("Copy");
-
-  CCSLIST_COPY(&slist, &cpy, t_entry, copy_entry, free);
-
-  CCSLIST_FOREACH(&cpy, tmp)
-    {
-      display_entry(tmp);
-    }
-
-  ut_step("Reversion");
-
-  CCSLIST_REVERSE(&cpy, t_entry);
-
-  CCSLIST_FOREACH(&cpy, tmp)
-    {
-      display_entry(tmp);
-    }
-
-  ut_step("Destruction");
-
-  CCSLIST_FREE(&slist);
-  CCSLIST_FREE(&cpy);
+  printf("%ld\n", CCSTACK_SIZE(&stack));
   return (0);
 }

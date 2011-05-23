@@ -153,7 +153,7 @@ int			main(void)
 
   puts("\n==Reversion==\n");
 
-  CCLIST_REVERSE(&list, s_list, struct s_entry);
+  CCLIST_REVERSE(&list, struct s_entry);
   CCLIST_FOREACH(&list, tmp)
     {
       entry_display(tmp);
