@@ -39,5 +39,6 @@
 #include "CCList.h"
 #include "CCSlist.h"
 #include "CCStack.h"
+#include "CCQueue.h"
 
 #endif		/* !CCONTAINERS_H_ */
