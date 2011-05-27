@@ -11,15 +11,6 @@ struct		s_entry
 
 CCLIST_PROTO(s_list, struct s_entry);
 
-static void		inspect(struct s_entry* entry)
-{
-  printf("val is: %d\n", entry->nb);
-  printf("entry is: %p\n", (void *)entry);
-  printf("prev is: %p\n", (void *)entry->prev);
-  printf("next is: %p\n", (void *)entry->next);
-  puts("");
-}
-
 static void		list_infos(CCLIST_NAME(s_list) *list)
 {
   printf("head is: %p :: %d\n", (void *)CCLIST_HEAD(list), CCLIST_HEAD(list)->nb);

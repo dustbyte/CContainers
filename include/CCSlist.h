@@ -30,13 +30,16 @@
 ** email <mota@souitom.org>
 **
 ** Started on  Fri May 20 03:54:25 2011 mota
-** Last update Mon May 23 00:35:04 2011 mota
+** Last update Fri May 27 19:08:16 2011 mota
 */
 
 #ifndef		CCSLIST_H_
 # define	CCSLIST_H_
 
 #include <stdlib.h>
+
+/* -- Types */
+
 
 #define		CCSLIST_ENTRY(entry_type)	\
 entry_type	*next
@@ -54,10 +57,21 @@ struct name
 #define		CCSLIST_CREATE(name)		\
 CCSLIST_NAME(name)
 
+/* -- List tools */
+
 #define		CCSLIST_EMPTY(list)	((list)->head == NULL)
 #define		CCSLIST_HEAD(list)	(list)->head
 #define		CCSLIST_SIZE(list)	(list)->size
 #define		CCSLIST_NEXT(entry)	(entry)->next
+
+#define		CCSLIST_INIT(list)		\
+do						\
+  {						\
+    CCSLIST_HEAD(list) = NULL;			\
+    CCSLIST_SIZE(list) = 0;			\
+  } while (0)
+
+/* -- Loops */
 
 #define		CCSLIST_FOREACH(list, tmp)	\
 for ((tmp) = CCSLIST_HEAD(list);		\
@@ -69,60 +83,31 @@ for ((tmp) = CCSLIST_HEAD(list);			\
      (tmp) != NULL && ((junk) = CCSLIST_NEXT(tmp));	\
      (tmp) = (junk))
 
-#define		CCSLIST_INIT(list)		\
-do						\
-  {						\
-    CCSLIST_HEAD(list) = NULL;			\
-    CCSLIST_SIZE(list) = 0;			\
-  } while (0)
+/* -- Searching */
 
-#define		CCSLIST_REF(list, newlist)	\
-do						\
-  {						\
-    CCSLIST_HEAD(newlist) = CCSLIST_HEAD(list);	\
-    CCSLIST_SIZE(newlist) = CCSLIST_SIZE(list);	\
-  } while (0)
-
-#define		CCSLIST_POP_HEAD(list, tmp)		\
+/* int (*cmp_func)(entry_type *left, entry_type *right) */
+#define		CCSLIST_FIND(list, tmp, ref, cmp_func)	\
 do							\
   {							\
-    (tmp) = CCSLIST_HEAD(list);				\
-    CCSLIST_HEAD(list) = CCSLIST_HEAD(list)->next;	\
-    --CCSLIST_SIZE(list);				\
-  } while (0)
-
-#define		CCSLIST_REMOVE(list, entry, entry_type)	\
-do							\
-  {							\
-    entry_type	*_tmp;					\
-							\
-    if ((entry) == CCSLIST_HEAD(list))			\
-      CCSLIST_REMOVE_HEAD(list, _tmp);			\
-    else						\
+    CCSLIST_FOREACH(list, tmp)				\
       {							\
-	CCSLIST_FOREACH(list, _tmp)			\
-	  if (CCSLIST_NEXT(_tmp) == (entry))		\
-	    break;					\
-	CCSLIST_NEXT(_tmp) = CCSLIST_NEXT(entry);	\
-	--CCSLIST_SIZE(list);				\
+	if (cmp_func(ref, tmp) == 0)			\
+	  break;					\
       }							\
   } while (0)
 
-#define		CCSLIST_INSERT_AFTER(list, before, entry)	\
-do								\
-  {								\
-    CCSLIST_NEXT(entry) = CCSLIST_NEXT(before);			\
-    CCSLIST_NEXT(before) = (entry);				\
-    ++CCSLIST_SIZE(list);					\
+/* int	(*cmp_func)(val_type left, val_type right) */
+#define		CCSLIST_FIND_FIELD(list, tmp, val, field, cmp_func)	\
+do									\
+  {									\
+    CCSLIST_FOREACH(list, tmp)						\
+      {									\
+	if (cmp_func(val, (tmp)->field) == 0)				\
+	  break;							\
+      }									\
   } while (0)
 
-#define		CCSLIST_INSERT(list, entry)		\
-do							\
-  {							\
-    CCSLIST_NEXT(entry) = CCSLIST_HEAD(list);		\
-    CCSLIST_HEAD(list) = (entry);			\
-    ++CCSLIST_SIZE(list);				\
-  } while (0)
+/* -- Operations */
 
 #define		CCSLIST_REVERSE(list, entry_type)	\
 do							\
@@ -138,6 +123,15 @@ do							\
       }							\
     CCSLIST_NEXT(_tmp) = (_dead);			\
     CCSLIST_HEAD(list) = (_tmp);			\
+  } while (0)
+
+/* --- Copy and reference */
+
+#define		CCSLIST_REF(list, newlist)	\
+do						\
+  {						\
+    CCSLIST_HEAD(newlist) = CCSLIST_HEAD(list);	\
+    CCSLIST_SIZE(newlist) = CCSLIST_SIZE(list);	\
   } while (0)
 
 /* void	(*copy_func)(const entry_type * const ref, entry_type *cpy); */
@@ -166,26 +160,68 @@ do									\
       }									\
   } while (0)
 
-/* int (*cmp_func)(entry_type *left, entry_type *right) */
-#define		CCSLIST_FIND(list, tmp, ref, cmp_func)	\
+#define		CCSLIST_DUP(list, newlist, entry_type)	\
 do							\
   {							\
-    CCSLIST_FOREACH(list, tmp)				\
+    entry_type	*_tmp;					\
+    entry_type	*_entry;				\
+							\
+    CCSLIST_INIT(newlist);				\
+    CCSLIST_FOREACH(list, _tmp)				\
       {							\
-	if (cmp_func(ref, tmp) == 0)			\
-	  break;					\
+	if ((_entry = malloc(sizeof(*_entry))) == NULL)	\
+	  {						\
+	    CCSLIST_CLEAR(newlist, delete_func);	\
+	    break;					\
+	  }						\
+	*_entry = *_tmp;				\
+	CCSLIST_INSERT(newlist, _entry);		\
       }							\
   } while (0)
 
-/* int	(*cmp_func)(val_type left, val_type right) */
-#define		CCSLIST_FIND_FIELD(list, tmp, val, field, cmp_func)	\
-do									\
-  {									\
-    CCSLIST_FOREACH(list, tmp)						\
-      {									\
-	if (cmp_func(val, (tmp)->field) == 0)				\
-	  break;							\
-      }									\
+/* -- Entry insertion */
+
+#define		CCSLIST_INSERT_AFTER(list, before, entry)	\
+do								\
+  {								\
+    CCSLIST_NEXT(entry) = CCSLIST_NEXT(before);			\
+    CCSLIST_NEXT(before) = (entry);				\
+    ++CCSLIST_SIZE(list);					\
+  } while (0)
+
+#define		CCSLIST_INSERT(list, entry)		\
+do							\
+  {							\
+    CCSLIST_NEXT(entry) = CCSLIST_HEAD(list);		\
+    CCSLIST_HEAD(list) = (entry);			\
+    ++CCSLIST_SIZE(list);				\
+  } while (0)
+
+/* -- Entry deletion */
+
+#define		CCSLIST_POP_HEAD(list, tmp)		\
+do							\
+  {							\
+    (tmp) = CCSLIST_HEAD(list);				\
+    CCSLIST_HEAD(list) = CCSLIST_HEAD(list)->next;	\
+    --CCSLIST_SIZE(list);				\
+  } while (0)
+
+#define		CCSLIST_REMOVE(list, entry, entry_type)	\
+do							\
+  {							\
+    entry_type	*_tmp;					\
+							\
+    if ((entry) == CCSLIST_HEAD(list))			\
+      CCSLIST_REMOVE_HEAD(list, _tmp);			\
+    else						\
+      {							\
+	CCSLIST_FOREACH(list, _tmp)			\
+	  if (CCSLIST_NEXT(_tmp) == (entry))		\
+	    break;					\
+	CCSLIST_NEXT(_tmp) = CCSLIST_NEXT(entry);	\
+	--CCSLIST_SIZE(list);				\
+      }							\
   } while (0)
 
 /* In C: void	(*free_func)(entry_type *entry) */
@@ -198,6 +234,8 @@ do							\
     CCSLIST_POP_HEAD(list, _tmp);			\
     free_func(_tmp);					\
   } while (0)
+
+/* -- List deletion */
 
 #define		CCSLIST_CLEAR(list, free_func)	\
 do						\

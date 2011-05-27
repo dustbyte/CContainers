@@ -24,55 +24,60 @@
 ** (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 ** SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **
-** CCStack.h for project CContainers
+** CCQueue.h for project CContainers
 **
 ** Made by mota
 ** email <mota@souitom.org>
 **
-** Started on  Mon May 23 00:47:14 2011 mota
-** Last update Fri May 27 19:08:51 2011 mota
+** Started on  Fri May 27 14:18:04 2011 mota
+** Last update Fri May 27 18:57:43 2011 mota
 */
 
-#ifndef		CCSTACK_H_
-# define	CCSTACK_H_
+#ifndef		CCQUEUE_H_
+# define	CCQUEUE_H_
 
-#include "CCSlist.h"
+#include "CCList.h"
 
-#define		CCSTACK_ENTRY(entry_type)	\
-CCSLIST_ENTRY(entry_type)
+#define		CCQUEUE_ENTRY(entry_type)	\
+CCLIST_ENTRY(entry_type)
 
-#define		CCSTACK_PROTO(name, entry_type)	\
-CCSLIST_PROTO(name, entry_type)
+#define		CCQUEUE_PROTO(name, entry_type)	\
+CCLIST_PROTO(name, entry_type)
 
-#define		CCSTACK_NAME(name)		\
-CCSLIST_NAME(name)
+#define		CCQUEUE_NAME(name)		\
+CCLIST_NAME()
 
-#define		CCSTACK_CREATE(name)		\
-CCSTACK_NAME(name)
+#define		CCQUEUE_CREATE(name)		\
+CCLIST_CREATE(name)
 
-#define		CCSTACK_EMPTY(stack)	CCSLIST_EMPTY(stack)
-#define		CCSTACK_TOP(stack)	CCSLIST_HEAD(stack)
-#define		CCSTACK_SIZE(stack)	CCSLIST_SIZE(stack)
+#define		CCQUEUE_EMTPY(queue)	CCLIST_EMPTY(queue)
+#define		CCQUEUE_HEAD(queue)	CCLIST_HEAD(queue)
+#define		CCQUEUE_TAIL(queue)	CCLIST_TAIL(queue)
+#define		CCQUEUE_SIZE(queue)	CCLIST_SIZE(queue)
 
-#define		CCSTACK_INIT(stack)		\
-CCSLIST_INIT(stack)
+#define		CCQUEUE_INIT(queue)	CCLIST_INIT(queue)
 
-#define		CCSTACK_REF(stack, newstack)	\
-CCSLIST_REF(stack, newstack)
+#define		CCQUEUE_PUSH(queue, entry)	\
+CCLIST_PUSH_FRONT(queue, entry)
 
-#define		CCSTACK_COPY(stack, newstack, entry_type, copy_func, delete_func) \
-CCSLIST_COPY(stack, newstack, entry_type, copy_func, delete_func)
+#define		CCQUEUE_POP(queue, var)		\
+CCLIST_POP_BACK(queue, var)
 
-#define		CCSTACK_PUSH(stack, entry)	\
-CCSLIST_INSERT(stack, entry)
+#define		CCQUEUE_REF(queue, newqueue)	\
+CCLIST_REF(queue, newqueue)
 
-#define		CCSTACK_POP(stack, tmp)		\
-CCSLIST_POP_HEAD(stack, tmp)
+/* void	(*copy_func)(const entry_type * const ref, entry_type *cpy); */
+/* void (*delete_func)(entry_type *entry); */
+#define		CCQUEUE_COPY(queue, newqueue, entry_type, copy_func, delete_func) \
+CCLIST_COPY(queue, newqueue, entry_type, copy_func, delete_func)
 
-#define		CCSTACK_CLEAR(stack, free_func)	\
-CCSLIST_CLEAR(stack, free_func)
+#define		CCQUEUE_DUP(queue, newqueue, entry_type)	\
+CCLIST_DUP(queue, newqueue, entry_type)
 
-#define		CCSTACK_FREE(stack)		\
-CCSTACK_CLEAR(stack, free)
+#define		CCQUEUE_CLEAR(queue, free_func)	\
+CCLIST_CLEAR(queue, free_func)
 
-#endif		/* !CCSTACK */
+#define		CCQUEUE_FREE(queue)		\
+CCQUEUE_CLEAR(queue, free)
+
+#endif		/* !CCQUEUE */
