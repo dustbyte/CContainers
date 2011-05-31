@@ -11,6 +11,11 @@ struct		s_entry
 
 CCLIST_PROTO(s_list, struct s_entry);
 
+static void		ut_step(const char *msg)
+{
+  printf("\n==%s==\n\n", msg);
+}
+
 static void		list_infos(CCLIST_NAME(s_list) *list)
 {
   printf("head is: %p :: %d\n", (void *)CCLIST_HEAD(list), CCLIST_HEAD(list)->nb);
@@ -83,7 +88,7 @@ int			main(void)
 
   CCLIST_INIT(&list);
 
-  puts("\n==Creating list (PUSH_BACK)==\n");
+  ut_step("Creating list (PUSH_BACK)");
 
   for (i = 6; i < 10; ++i)
     {
@@ -92,7 +97,7 @@ int			main(void)
       puts("");
     }
 
-  puts("\n==Adding items (PUSH_FRONT)==\n");
+  ut_step("Adding items (PUSH_FRONT)");
 
   for (i = 5; i > 0; --i)
     {
@@ -101,30 +106,30 @@ int			main(void)
       puts("");
     }
 
-  puts("\n==For finding test (PUSH_BACK)==\n");
+  ut_step("For finding test (PUSH_BACK)");
 
   create_entry(&list, 6);
   list_infos(&list);
 
-  puts("\n==Show list size==\n");
+  ut_step("Show list size");
 
   printf("size: %d\n", CCLIST_SIZE(&list));
 
-  puts("\n==Iteration==\n");
+  ut_step("Iteration");
 
   CCLIST_FOREACH(&list, tmp)
     {
       entry_display(tmp);
     }
 
-  puts("\n==Reverse iteration==\n");
+  ut_step("Reverse iteration");
 
   CCLIST_RFOREACH(&list, tmp)
     {
       entry_display(tmp);
     }
 
-  puts("\n==Copy==\n");
+  ut_step("Copy");
 
   CCLIST_COPY(&list, &copy, struct s_entry, copy_entry, free);
 
@@ -133,9 +138,7 @@ int			main(void)
       entry_display(tmp);
     }
 
-  CCLIST_FREE(&copy);
-
-  puts("\n==Reversion==\n");
+  ut_step("Reversion");
 
   CCLIST_REVERSE(&list, struct s_entry);
   CCLIST_FOREACH(&list, tmp)
@@ -143,35 +146,35 @@ int			main(void)
       entry_display(tmp);
     }
 
-  puts("\n==Find entry==\n");
+  ut_step("Find entry");
 
   tmp = NULL;
   CCLIST_FIND(&list, tmp, &ref, entry_cmp);
   if (tmp != NULL)
       entry_display(tmp);
 
-  puts("\n==Reverse find entry==\n");
+  ut_step("Reverse find entry");
 
   tmp = NULL;
   CCLIST_RFIND(&list, tmp, &ref, entry_cmp);
   if (tmp != NULL)
       entry_display(tmp);
 
-  puts("\n==Find entry with field==\n");
+  ut_step("Find entry with field");
 
   tmp = NULL;
   CCLIST_FIND_FIELD(&list, tmp, 6, nb, val_cmp);
   if (tmp != NULL)
       entry_display(tmp);
 
-  puts("\n==Reverse find entry with field==\n");
+  ut_step("Reverse find entry with field");
 
   tmp = NULL;
   CCLIST_RFIND_FIELD(&list, tmp, 6, nb, val_cmp);
   if (tmp != NULL)
       entry_display(tmp);
 
-  puts("\n==Deletion==\n");
+  ut_step("Deletion");
 
   if (tmp != NULL)
     CCLIST_REMOVE(&list, tmp);
@@ -181,7 +184,7 @@ int			main(void)
       entry_display(junk);
     }
 
-  puts("\n==Insertion==\n");
+  ut_step("Insertion");
 
   if (tmp != NULL)
     CCLIST_INSERT(&list, CCLIST_PREV(CCLIST_TAIL(&list)), tmp);
@@ -191,7 +194,7 @@ int			main(void)
       entry_display(junk);
     }
 
-  puts("\n==Swapping==\n");
+  ut_step("Swapping");
 
   tmp = CCLIST_HEAD(&list);
   tmp2 = CCLIST_TAIL(&list);
@@ -210,7 +213,7 @@ int			main(void)
       entry_display(junk);
     }
 
-  puts("\n==Sorting==\n");
+  ut_step("Sorting");
 
   CCLIST_SORT(&list, struct s_entry, entry_cmp);
 
@@ -219,7 +222,18 @@ int			main(void)
       entry_display(junk);
     }
 
-  puts("\n==Deleting list from the begining==\n");
+  ut_step("Concatenation");
+
+  CCLIST_CONCAT(&list, &copy);
+
+  CCLIST_FOREACH(&list, tmp)
+    {
+      entry_display(tmp);
+    }
+
+  CCLIST_FREE(&copy);
+
+  ut_step("Deleting list from the begining");
 
   CCLIST_FOREACH_SAFE(&list, tmp, junk)
     {
@@ -230,7 +244,7 @@ int			main(void)
       free(tmp);
     }
 
-  puts("\n==Deleting list from the end==\n");
+  ut_step("Deleting list from the end");
 
   CCLIST_RFOREACH_SAFE(&list, tmp, junk)
     {
@@ -241,11 +255,11 @@ int			main(void)
       free(tmp);
     }
 
-  puts("\n==Deleting the rest==\n");
+  ut_step("Deleting the rest");
 
   CCLIST_CLEAR(&list, free);
 
-  puts("\n==Try again==\n");
+  ut_step("Try again");
   CCLIST_FREE(&list);
 
   printf("size: %d\n\n", CCLIST_SIZE(&list));

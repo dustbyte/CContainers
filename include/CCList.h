@@ -30,7 +30,7 @@
 ** email <mota@souitom.org>
 **
 ** Started on  Sat May 14 03:08:37 2011 mota
-** Last update Tue May 31 18:51:48 2011 mota
+** Last update Tue May 31 19:49:21 2011 mota
 */
 
 #ifndef		CCLIST_H_
@@ -195,6 +195,24 @@ do								\
 	    __tmp = CCLIST_HEAD(list);				\
 	  }							\
       }								\
+  } while (0)
+
+#define		CCLIST_CONCAT(left_list, right_list)			\
+do									\
+  {									\
+    if (!CCLIST_EMPTY(right_list))					\
+      {									\
+	if (!CCLIST_EMPTY(left_list))					\
+	  {								\
+	    CCLIST_TAIL(left_list)->next = CCLIST_HEAD(right_list);	\
+	    CCLIST_HEAD(right_list)->prev = CCLIST_TAIL(left_list);	\
+	    CCLIST_SIZE(left_list) += CCLIST_SIZE(right_list);		\
+	    CCLIST_TAIL(left_list) = CCLIST_TAIL(right_list);		\
+	  }								\
+	else								\
+	  CCLIST_REF(right_list, left_list);				\
+	CCLIST_INIT(right_list);					\
+      }									\
   } while (0)
 
 /* --- Copy and reference */

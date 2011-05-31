@@ -30,7 +30,7 @@
 ** email <mota@souitom.org>
 **
 ** Started on  Sun May 22 22:42:54 2011 mota
-** Last update Tue May 31 18:58:04 2011 mota
+** Last update Tue May 31 20:01:53 2011 mota
 */
 
 #include <stdio.h>
@@ -154,11 +154,21 @@ int		main(void)
       display_entry(tmp);
     }
 
+  ut_step("Concatenation");
+
+  CCSLIST_CONCAT(&slist, &cpy, t_entry);
+
+  CCSLIST_FOREACH(&slist, tmp)
+    {
+      display_entry(tmp);
+    }
+
   ut_step("Destruction");
 
   CCSLIST_FREE(&slist);
   CCSLIST_FREE(&cpy);
 
-  printf("%ld\n\n", CCSLIST_SIZE(&slist));
+  printf("slist: %ld\n", CCSLIST_SIZE(&slist));
+  printf("cpy: %ld\n\n", CCSLIST_SIZE(&cpy));
   return (0);
 }

@@ -30,7 +30,7 @@
 ** email <mota@souitom.org>
 **
 ** Started on  Fri May 20 03:54:25 2011 mota
-** Last update Tue May 31 18:54:31 2011 mota
+** Last update Tue May 31 19:58:44 2011 mota
 */
 
 #ifndef		CCSLIST_H_
@@ -63,6 +63,15 @@ CCSLIST_NAME(name)
 #define		CCSLIST_HEAD(list)	(list)->head
 #define		CCSLIST_SIZE(list)	(list)->size
 #define		CCSLIST_NEXT(entry)	(entry)->next
+
+#define		CCSLIST_LAST(list, tmp)		\
+do						\
+  {						\
+    tmp = NULL;					\
+    CCSLIST_FOREACH(list, tmp)			\
+      if (tmp->next == NULL)			\
+	break;					\
+  } while (0)
 
 #define		CCSLIST_INIT(list)		\
 do						\
@@ -124,6 +133,24 @@ do							\
     CCSLIST_NEXT(_tmp) = (_dead);			\
     CCSLIST_HEAD(list) = (_tmp);			\
   } while (0)
+
+#define		CCSLIST_CONCAT(left_list, right_list, entry_type)	\
+{									\
+  entry_type	*_tmp;							\
+									\
+  if (!CCSLIST_EMPTY(right_list))					\
+    {									\
+      if (!CCSLIST_EMPTY(left_list))					\
+	{								\
+	  CCSLIST_LAST(left_list, _tmp);				\
+ 	  CCSLIST_NEXT(_tmp) = CCSLIST_HEAD(right_list);		\
+	  CCSLIST_SIZE(left_list) += CCSLIST_SIZE(right_list);		\
+	}								\
+      else								\
+	CCSLIST_REF(right_list, left_list);				\
+      CCSLIST_INIT(right_list);						\
+    }									\
+}
 
 /* --- Copy and reference */
 
