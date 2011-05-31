@@ -62,9 +62,13 @@ static int		val_cmp(int left, int right)
   return (left - right);
 }
 
-static void		copy_entry(const struct s_entry * const ref, struct s_entry *cpy)
+static struct s_entry	*copy_entry(const struct s_entry * const ref)
 {
-  cpy->nb = ref->nb;
+  struct s_entry	*cpy = malloc(sizeof(*cpy));
+
+  if (cpy != NULL)
+    cpy->nb = ref->nb;
+  return (cpy);
 }
 
 int			main(void)
@@ -119,17 +123,6 @@ int			main(void)
     {
       entry_display(tmp);
     }
-
-  puts("\n==Duplication==\n");
-
-  CCLIST_DUP(&list, &copy, struct s_entry);
-
-  CCLIST_FOREACH(&copy, tmp)
-    {
-      entry_display(tmp);
-    }
-
-  CCLIST_FREE(&copy);
 
   puts("\n==Copy==\n");
 

@@ -33,6 +33,15 @@ static void	create_entry(t_queue *queue, int val)
     }
 }
 
+static struct s_entry	*copy_entry(const struct s_entry *entry)
+{
+  struct s_entry	*cpy = malloc(sizeof(*cpy));
+
+  if (cpy != NULL)
+    cpy->nb = entry->nb;
+  return (cpy);
+}
+
 void		ut_step(const char *str)
 {
   printf("\n==%s==\n\n", str);
@@ -56,7 +65,7 @@ int		main(void)
 
   ut_step("Copy");
 
-  CCQUEUE_DUP(&queue, &cpy, t_entry);
+  CCQUEUE_COPY(&queue, &cpy, struct s_entry, copy_entry, free);
 
   display_queue(&cpy);
 

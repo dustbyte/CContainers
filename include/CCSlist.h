@@ -30,7 +30,7 @@
 ** email <mota@souitom.org>
 **
 ** Started on  Fri May 20 03:54:25 2011 mota
-** Last update Fri May 27 19:08:16 2011 mota
+** Last update Tue May 31 18:54:31 2011 mota
 */
 
 #ifndef		CCSLIST_H_
@@ -134,7 +134,7 @@ do						\
     CCSLIST_SIZE(newlist) = CCSLIST_SIZE(list);	\
   } while (0)
 
-/* void	(*copy_func)(const entry_type * const ref, entry_type *cpy); */
+/* void	(*copy_func)(const entry_type * const ref); */
 /* void (*delete_func)(entry_type *entry); */
 #define		CCSLIST_COPY(list, newlist, entry_type, copy_func, delete_func) \
 do									\
@@ -146,37 +146,17 @@ do									\
     CCSLIST_INIT(newlist);						\
     CCSLIST_FOREACH(list, _tmp)						\
       {									\
-	if ((_entry = malloc(sizeof *_entry)) == NULL)			\
+	if ((_entry = copy_func(_tmp)) == NULL)				\
 	  {								\
 	    CCSLIST_CLEAR(newlist, delete_func);			\
 	    break;							\
 	  }								\
-	copy_func(_tmp, _entry);					\
 	if (CCSLIST_HEAD(newlist) == NULL)				\
 	  CCSLIST_INSERT(newlist, _entry);				\
 	else								\
 	  CCSLIST_INSERT_AFTER(newlist, _dead, _entry);			\
 	_dead = (_entry);						\
       }									\
-  } while (0)
-
-#define		CCSLIST_DUP(list, newlist, entry_type)	\
-do							\
-  {							\
-    entry_type	*_tmp;					\
-    entry_type	*_entry;				\
-							\
-    CCSLIST_INIT(newlist);				\
-    CCSLIST_FOREACH(list, _tmp)				\
-      {							\
-	if ((_entry = malloc(sizeof(*_entry))) == NULL)	\
-	  {						\
-	    CCSLIST_CLEAR(newlist, delete_func);	\
-	    break;					\
-	  }						\
-	*_entry = *_tmp;				\
-	CCSLIST_INSERT(newlist, _entry);		\
-      }							\
   } while (0)
 
 /* -- Entry insertion */

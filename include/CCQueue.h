@@ -30,7 +30,7 @@
 ** email <mota@souitom.org>
 **
 ** Started on  Fri May 27 14:18:04 2011 mota
-** Last update Fri May 27 18:57:43 2011 mota
+** Last update Tue May 31 18:51:36 2011 mota
 */
 
 #ifndef		CCQUEUE_H_
@@ -66,13 +66,10 @@ CCLIST_POP_BACK(queue, var)
 #define		CCQUEUE_REF(queue, newqueue)	\
 CCLIST_REF(queue, newqueue)
 
-/* void	(*copy_func)(const entry_type * const ref, entry_type *cpy); */
+/* void	(*copy_func)(const entry_type * const ref); */
 /* void (*delete_func)(entry_type *entry); */
 #define		CCQUEUE_COPY(queue, newqueue, entry_type, copy_func, delete_func) \
 CCLIST_COPY(queue, newqueue, entry_type, copy_func, delete_func)
-
-#define		CCQUEUE_DUP(queue, newqueue, entry_type)	\
-CCLIST_DUP(queue, newqueue, entry_type)
 
 #define		CCQUEUE_CLEAR(queue, free_func)	\
 CCLIST_CLEAR(queue, free_func)

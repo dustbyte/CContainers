@@ -30,7 +30,7 @@
 ** email <mota@souitom.org>
 **
 ** Started on  Mon May 23 01:12:01 2011 mota
-** Last update Mon May 23 03:39:49 2011 mota
+** Last update Tue May 31 18:58:13 2011 mota
 */
 
 #include <stdio.h>
@@ -70,9 +70,13 @@ static void	push_on_stack(t_stack *stack, int i)
     }
 }
 
-static void	copy_entry(const t_entry * const left, t_entry *right)
+static t_entry	*copy_entry(const t_entry * const orig)
 {
-  right->nb = left->nb;
+  t_entry	*cpy = malloc(sizeof(*orig));
+
+  if (cpy != NULL)
+    cpy->nb = orig->nb;
+  return (cpy);
 }
 
 static void	ut_step(const char *msg)
@@ -113,6 +117,6 @@ int		main(void)
   CCSTACK_FREE(&stack);
   CCSTACK_FREE(&cpy);
 
-  printf("%ld\n", CCSTACK_SIZE(&stack));
+  printf("%ld\n\n", CCSTACK_SIZE(&stack));
   return (0);
 }

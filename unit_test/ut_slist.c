@@ -30,7 +30,7 @@
 ** email <mota@souitom.org>
 **
 ** Started on  Sun May 22 22:42:54 2011 mota
-** Last update Mon May 23 01:12:59 2011 mota
+** Last update Tue May 31 18:58:04 2011 mota
 */
 
 #include <stdio.h>
@@ -76,9 +76,13 @@ static void	display_entry(t_entry *entry)
   printf("%d :: %p\n", entry->nb, (void *)entry);
 }
 
-static void	copy_entry(const t_entry * const orig, t_entry *copy)
+static t_entry	*copy_entry(const t_entry * const orig)
 {
-  copy->nb = orig->nb;
+  t_entry	*cpy = malloc(sizeof(*cpy));
+
+  if (cpy != NULL)
+    cpy->nb = orig->nb;
+  return (cpy);
 }
 
 static void	ut_step(const char *msg)
@@ -154,5 +158,7 @@ int		main(void)
 
   CCSLIST_FREE(&slist);
   CCSLIST_FREE(&cpy);
+
+  printf("%ld\n\n", CCSLIST_SIZE(&slist));
   return (0);
 }

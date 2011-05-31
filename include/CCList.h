@@ -30,7 +30,7 @@
 ** email <mota@souitom.org>
 **
 ** Started on  Sat May 14 03:08:37 2011 mota
-** Last update Fri May 27 19:01:32 2011 mota
+** Last update Tue May 31 18:51:48 2011 mota
 */
 
 #ifndef		CCLIST_H_
@@ -207,7 +207,7 @@ do						\
     CCLIST_SIZE(newlist) = CCLIST_SIZE(list);	\
   } while (0)
 
-/* void	(*copy_func)(const entry_type * const ref, entry_type *cpy); */
+/* void	(*copy_func)(const entry_type * const ref); */
 /* void (*delete_func)(entry_type *entry); */
 #define		CCLIST_COPY(list, newlist, entry_type, copy_func, delete_func) \
 do									\
@@ -218,33 +218,13 @@ do									\
     CCLIST_INIT(newlist);						\
     CCLIST_FOREACH(list, _tmp)						\
       {									\
-	if ((_entry = malloc(sizeof *_entry)) == NULL)			\
+	if ((_entry = copy_func(_tmp)) == NULL)				\
 	  {								\
 	    CCLIST_CLEAR(newlist, delete_func);				\
 	    break;							\
 	  }								\
-	copy_func(_tmp, _entry);					\
 	CCLIST_PUSH_BACK(newlist, _entry);				\
       }									\
-  } while (0)
-
-#define		CCLIST_DUP(list, newlist, entry_type)	\
-do							\
-  {							\
-    entry_type	*_tmp;					\
-    entry_type	*_entry;				\
-							\
-    CCLIST_INIT(newlist);				\
-    CCLIST_FOREACH(list, _tmp)				\
-      {							\
-	if ((_entry = malloc(sizeof *_entry)) == NULL)	\
-	  {						\
-	    CCLIST_FREE(newlist);			\
-	    break;					\
-	  }						\
-	*_entry = *_tmp;				\
-	CCLIST_PUSH_BACK(newlist, _entry);		\
-      }							\
   } while (0)
 
 /* -- Entry insertion */
