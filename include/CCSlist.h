@@ -1,5 +1,5 @@
 /*
-** Copyright(c), CContainers
+** Copyright(c), Pierre ``Mota'' Wacrenier
 ** All rights reserved.
 ** Redistribution and use in source and binary forms, with or without
 ** modification, are permitted provided that the following conditions are met:
@@ -29,8 +29,8 @@
 ** Made by mota
 ** email <mota@souitom.org>
 **
-** Started on  Fri May 20 03:54:25 2011 mota
-** Last update Tue May 31 19:58:44 2011 mota
+** Started on  Sat Jul  9 23:31:02 2011 mota
+** Last update Sat Jul  9 23:31:03 2011 mota
 */
 
 #ifndef		CCSLIST_H_

@@ -168,7 +168,7 @@ int		main(void)
   CCSLIST_FREE(&slist);
   CCSLIST_FREE(&cpy);
 
-  printf("slist: %ld\n", CCSLIST_SIZE(&slist));
-  printf("cpy: %ld\n\n", CCSLIST_SIZE(&cpy));
+  printf("slist: %d\n", CCSLIST_SIZE(&slist));
+  printf("cpy: %d\n\n", CCSLIST_SIZE(&cpy));
   return (0);
 }

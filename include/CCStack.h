@@ -1,5 +1,5 @@
 /*
-** Copyright(c), CContainers
+** Copyright(c), Pierre ``Mota'' Wacrenier
 ** All rights reserved.
 ** Redistribution and use in source and binary forms, with or without
 ** modification, are permitted provided that the following conditions are met:
@@ -29,8 +29,8 @@
 ** Made by mota
 ** email <mota@souitom.org>
 **
-** Started on  Mon May 23 00:47:14 2011 mota
-** Last update Fri May 27 19:08:51 2011 mota
+** Started on  Sat Jul  9 23:31:11 2011 mota
+** Last update Sat Jul  9 23:31:12 2011 mota
 */
 
 #ifndef		CCSTACK_H_

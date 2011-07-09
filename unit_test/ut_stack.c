@@ -117,6 +117,6 @@ int		main(void)
   CCSTACK_FREE(&stack);
   CCSTACK_FREE(&cpy);
 
-  printf("%ld\n\n", CCSTACK_SIZE(&stack));
+  printf("%d\n\n", CCSTACK_SIZE(&stack));
   return (0);
 }
